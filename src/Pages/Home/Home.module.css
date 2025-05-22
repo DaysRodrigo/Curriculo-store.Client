@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@plugin "daisyui";
+
+
+.mdDiv {
+    @apply text-black;
+    @apply flex flex-col gap-4;
+    @apply w-full h-full;
+    @apply p-5;
+    overflow-y: auto;
+}
+
+.mdDiv::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mdDiv::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
+}
+
+.mdDiv::-webkit-scrollbar-track {
+    background: transparent;
+}

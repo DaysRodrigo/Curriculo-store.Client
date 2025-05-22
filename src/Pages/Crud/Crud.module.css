@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@plugin "daisyui";
+
+input,
+select,
+textarea {
+    @apply bg-white;
+    @apply text-slate-900;
+    @apply text-xs;
+}
+
+label,
+button {
+    @apply text-slate-900;
+    @apply text-sm;
+}
+
+a {
+    @apply text-red-600;
+}
+
+.cardCrud {
+    font-family: 'Inter', sans-serif;
+    @apply bg-yellow-100;
+    @apply shadow-lg;
+    @apply p-5;
+    @apply m-5;
+    @apply w-2/5;
+}
+
+.buttonCreate {
+    @apply btn-outline;
+    @apply shadow-md;
+    @apply border-slate-500;
+    @apply bg-white;
+    @apply hover:bg-slate-300;
+    border: 1.5px solid #cbd5e1;
+}
