@@ -1,5 +1,7 @@
+const apiUrl = import.meta.env.VITE_API_URL;
+
 export async function getUrl(file: File): Promise<string> {
-    const response = await fetch(`/api/cloudstorage/generate-presigned-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
+    const response = await fetch(`${apiUrl}/api/cloudstorage/generate-presigned-url?fileName=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`);
     if (!response.ok) {
         throw new Error("Failed to get URL");
     }
