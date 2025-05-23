@@ -25,7 +25,6 @@ const Crud = () => {
     const [descriptionUpdt, setDescriptionUpdt] = React.useState("");
     const [file, setFile] = React.useState<File | null>(null);
     const [updateFile, setUpdateFile] = useState<File | null>(null);
-    const [newUrl, setnewUrl] = useState<string | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
     const [errorMessageUpdt, setErrorMessageUpdt] = React.useState<string | null>(null);
@@ -71,7 +70,6 @@ const Crud = () => {
 
             if ( file ) {
                 const publicUrl = await uploadFile(file);
-                setnewUrl(publicUrl);
                 data = {
                     nome: name,
                     tipo: type,
