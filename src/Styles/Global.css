@@ -7,7 +7,7 @@
 body {
   @apply bg-white text-base-content;
   @apply overflow-x-hidden;
-  font-family: 'Inter', sans-serif;
+  @apply font-poppins;
 }
 
 h1 {
@@ -37,65 +37,4 @@ input {
 
 .container-center {
   @apply max-w-screen-lg mx-auto px-4;
-}
-
-.type-button {
-  @apply btn btn-primary;
-  @apply text-black;
-  @apply border-black border-[.8px] shadow-lg;
-  @apply p-4;
-  @apply hover:bg-yellow-100;
-  @apply bg-yellow-50;
-  @apply rounded-lg;
-}
-
-.card {
-  font-family: 'Inter', sans-serif;
-  @apply bg-yellow-50;
-  @apply text-black;
-  @apply m-5;
-  @apply w-72;
-  @apply h-60;
-}
-
-.card-price {
-  @apply text-2xl;
-  @apply font-bold;
-  @apply text-center;
-  @apply mt-8;
-}
-
-.products-section {
-  background-image: url('../assets/images/13104.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.imgAbout {
-  @apply rounded-lg;
-  @apply w-fit;
-}
-
-.about-content {
-  width: 50%;
-  @apply text-justify;
-  @apply text-lg;
-}
-
-.about-me {
-  background-image: url('../assets/images/13107.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.carousel {
-  @apply cursor-pointer;
-  @apply overflow-x-auto;
-  @apply flex-nowrap;
-  @apply cursor-grab;
-  @apply scroll-smooth;
-  @apply w-full;
-  @apply max-w-full;
 }

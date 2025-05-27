@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@plugin "daisyui";
+
+
+body {
+    @apply text-white;
+    @apply font-poppins;
+}
+
+.imageType {
+    @apply w-12;
+    @apply h-12;
+    @apply rounded-lg;
+}
+
+.card {
+    @apply text-black text-base font-extralight text-center;
+    @apply mt-8;
+    @apply bg-white/50 backdrop-blur-md rounded-lg;
+    @apply cursor-pointer;
+}
