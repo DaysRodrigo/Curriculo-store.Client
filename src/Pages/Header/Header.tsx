@@ -36,10 +36,10 @@ const Header = ({ toggleCart, cartItems, isCartOpen, setCartItems }: HeaderProps
         <>
             <header className="navbar">
                 <div className="join gap-40">
-                    <button onClick={() => filterByType(TipoProduto.Acadêmico)} className={`join-item `}>Formação Acadêmica</button>
-                    <button onClick={() => filterByType(TipoProduto.Experiência)} className={`join-item `}>Experiência</button>
-                    <button onClick={() => filterByType(TipoProduto.Curso)} className={`join-item `}>Certificações</button>
-                    <button onClick={() => filterByType(TipoProduto.Outro)} className={`join-item `}>Outros</button>
+                    <button onClick={() => filterByType(TipoProduto.Acadêmico)} className={`${styles.buttonT} join-item `}>Formação Acadêmica</button>
+                    <button onClick={() => filterByType(TipoProduto.Experiência)} className={`join-item ${styles.buttonT}`}>Experiência</button>
+                    <button onClick={() => filterByType(TipoProduto.Curso)} className={`join-item ${styles.buttonT}`}>Certificações</button>
+                    <button onClick={() => filterByType(TipoProduto.Outro)} className={`join-item ${styles.buttonT}`}>Outros</button>
                     <button className="btn btn-ghost btn-circle" onClick={toggleCart}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-black hover:text-cyan-500" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">

@@ -14,8 +14,8 @@ header {
     @apply shadow-md;
 }
 
-button {
-    @apply text-sm text-gray-200;
+.buttonT {
+    @apply text-sm text-black;
     @apply hover:text-cyan-500;
     @apply transition-colors duration-300;
     @apply cursor-pointer;

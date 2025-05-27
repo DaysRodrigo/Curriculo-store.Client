@@ -25,11 +25,6 @@ const AppRoutes = () => {
 
     return (
         <Router>
-            <Header 
-                toggleCart={toggleCart}
-                cartItems={cartItems}
-                isCartOpen={isCartOpen}
-                setCartItems={setCartItems} />
             <Routes>
                 <Route path="/" element={<Home 
                         cartItems={cartItems}
