@@ -28,7 +28,7 @@ const TypeProduct = ({ cartItems, setCartItems, toggleCart, isCartOpen }: TypePr
     const { tipo } = useParams();
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct ] = useState<Product>();
 
     const imageMap: { [key: number]: string } = {
@@ -49,7 +49,7 @@ const TypeProduct = ({ cartItems, setCartItems, toggleCart, isCartOpen }: TypePr
         localStorage.setItem("id", id.toString());
         const product = products.find( product => product.id === id);
         setSelectedProduct(product);
-        setIsModalOpen(true);
+        // setIsModalOpen(true);
     }
 
     const handleAddToCart = (product: Product) => {

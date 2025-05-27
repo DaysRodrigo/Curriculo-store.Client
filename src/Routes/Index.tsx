@@ -5,7 +5,6 @@ import Login from "../Pages/Login/Login";
 import Crud from "../Pages/Crud/Crud";
 import TypeProduct from "../Pages/Product/TypeProduct";
 import PrivateRoute from "../Middleware/PrivateRoute";
-import Header from "../Pages/Header/Header";
 
 interface Product {
     id: number;

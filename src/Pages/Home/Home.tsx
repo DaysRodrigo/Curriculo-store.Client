@@ -29,7 +29,7 @@ interface HomeProps {
 const Home = ({ cartItems, setCartItems, toggleCart, isCartOpen }: HomeProps) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct ] = useState<Product>();
 
 
@@ -64,7 +64,7 @@ const Home = ({ cartItems, setCartItems, toggleCart, isCartOpen }: HomeProps) =>
         localStorage.setItem("id", id.toString());
         const product = products.find( product => product.id === id);
         setSelectedProduct(product);
-        setIsModalOpen(true);
+        // setIsModalOpen(true);
     }
 
 
