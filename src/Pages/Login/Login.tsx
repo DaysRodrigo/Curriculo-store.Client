@@ -20,7 +20,7 @@ interface User {
 interface JwtPayload {
     exp: number;
     tipo: number;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export function Login () {
@@ -113,8 +113,10 @@ export function Login () {
                 setErrorMessage("Usuário ou senha inválidos");
             }
             
-        } catch (error: any) {
-            setErrorMessage("Erro ao fazer login: " + error.message);
+        } catch (error: unknown) {
+            if( error instanceof Error ) {
+                setErrorMessage("Erro ao fazer login: " + error.message);
+            }
         } finally {
             setIsLoading(false);
         }

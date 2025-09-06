@@ -12,33 +12,33 @@ import { useToast } from "@/hooks/use-toast";
 import { ExternalLink, Upload } from "lucide-react";
 
 interface Product {
-    id: number;
+    id?: number;
     nome: string;
     descricao: string;
     tipo: number;
-    fileUrl: string;
+    fileUrl?: string;
 }
 
 export function Crud () {
     //Create
     const [name, setName] = React.useState("");
-    const [type, setType] = useState<TipoProduto | "">("");
+    const [type, setType] = useState<TipoProduto | null>(null);
     const [description, setDescription] = React.useState("");
     const [file, setFile] = React.useState<File | null>(null);
     const [isCreating, setIsCreating] = useState(false);
 
     //Update
     const [nameUpdt, setNameUpdt] = React.useState("");
-    const [typeUpdt, setTypeUpdt] = useState<TipoProduto | "">("");
+    const [typeUpdt, setTypeUpdt] = useState<TipoProduto | null>(null);
     const [descriptionUpdt, setDescriptionUpdt] = React.useState("");
     const [updateFile, setUpdateFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-    const [selectedProductId, setSelectedProductId] = useState<number | "">("");
+    const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
 
     //Delete
     const [nameDlt, setNameDlt] = React.useState("");
-    const [dltProductId, setDltProductId] = useState<number | "">("");
+    const [dltProductId, setDltProductId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
     //General
@@ -64,12 +64,14 @@ export function Crud () {
                 setIsLoading(true);
                 const data: Array<Product> = await getProducts();
                 setProducts(data);
-            } catch (error: any) {
-                toast({
-                    variant: "destructive",
-                    title: "Erro",
-                    description: "Erro ao carregar produtos. " + error.message
-                });
+            } catch (error: unknown) {
+                if( error instanceof Error ) {
+                    toast({
+                        variant: "destructive",
+                        title: "Erro",
+                        description: "Erro ao carregar produtos. " + error.message
+                    });
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -80,7 +82,7 @@ export function Crud () {
     
     const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!name || description.trim() === "" || type === "" ) {
+        if (!name || description.trim() === "" || type === null ) {
             toast({
                 variant: "destructive",
                 title: "Campos obrigatórios",
@@ -100,9 +102,9 @@ export function Crud () {
 
         try {
             setIsCreating(true);
-            const data: any = {
+            const data: Product = {
                 nome: name,
-                tipo: type,
+                tipo: type.id,
                 descricao: description,
             };
 
@@ -119,7 +121,7 @@ export function Crud () {
 
                 //Reset Form
                 setName("");
-                setType("");
+                setType(null);
                 setDescription("");
                 setFile(null);
 
@@ -133,12 +135,14 @@ export function Crud () {
                 description: "Erro ao criar produto"
             });
             }
-        } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Erro",
-                description: "Erro ao criar produto: " + error.message
-            });
+        } catch (error: unknown) {
+            if( error instanceof Error ) {
+                toast({
+                    variant: "destructive",
+                    title: "Erro",
+                    description: "Erro ao criar produto: " + error.message
+                });
+            }
         } finally {
             setIsCreating(false);
         }
@@ -146,7 +150,7 @@ export function Crud () {
 
     const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!nameUpdt || typeUpdt === "" || !updateFile || !descriptionUpdt) {
+        if (!nameUpdt || typeUpdt === null || !updateFile || !descriptionUpdt) {
             toast({
                 variant: "destructive",
                 title: "Campos obrigatórios",
@@ -160,11 +164,11 @@ export function Crud () {
             const publicUrl = await uploadFile(updateFile);
             setPreviewUrl(publicUrl);
             const id = Number(localStorage.getItem('selectedId'));
-            const data: any = {
-                Nome: nameUpdt,
-                Tipo: typeUpdt,
-                fileurl: publicUrl,
-                Descricao: descriptionUpdt,
+            const data: Product = {
+                nome: nameUpdt,
+                tipo: typeUpdt ? typeUpdt.id : 0,
+                fileUrl: publicUrl,
+                descricao: descriptionUpdt,
             }
             
             const response = await updateProduct(data, id);
@@ -184,12 +188,14 @@ export function Crud () {
                     description: "Erro ao atualizar produto"
                 });
             }
-        } catch (error: any) {
-                toast({
-                    variant: "destructive",
-                    title: "Erro",
-                    description: "Erro ao atualizar o produto: " + error.message
-                });
+        } catch (error: unknown) {
+                if( error instanceof Error ) {
+                    toast({
+                        variant: "destructive",
+                        title: "Erro",
+                        description: "Erro ao atualizar o produto: " + error.message
+                    });
+                }
         } finally {
             setIsUpdating(false);
         }
@@ -217,7 +223,7 @@ export function Crud () {
                 });
 
                 //Reset form
-                setDltProductId("");
+                setDltProductId(null);
                 setNameDlt("");
 
                 //Reload products
@@ -230,12 +236,14 @@ export function Crud () {
                     description: "Erro ao excluir produto"
                 });
             }
-        } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Erro",
-                description: "Erro ao excluir produto: " + error.message
-            });
+        } catch (error: unknown) {
+            if( error instanceof Error ) {
+                toast({
+                    variant: "destructive",
+                    title: "Erro",
+                    description: "Erro ao excluir produto: " + error.message
+                });
+            }
         } finally {
             setIsDeleting(false);
         }
@@ -399,7 +407,9 @@ export function Crud () {
 
                             <div>
                                 <Label htmlFor="type">Tipo</Label>
-                                <Select value={type === "" ? "" : type.id.toString()} onValueChange={(value) => setType(value === "" ? "" : TipoProduto.find(tipo => tipo.id === Number(value)) || "")}>
+                                <Select value={ type?.id.toString() || "" }
+                                    onValueChange={(value) =>
+                                        setType(value ? TipoProduto.find(tipo => tipo.id === Number(value)) || null : null )}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Selecione o tipo" />
                                     </SelectTrigger>
@@ -459,24 +469,26 @@ export function Crud () {
                         <form onSubmit={handleUpdate} className="space-y-4">
                             <div>
                                 <Label htmlFor="products">Selecione o produto para atualizar</Label>
-                                <Select value={selectedProductId.toString()} onValueChange={(value) => {
-                                    const id = value ? Number(value) : "";
+                                <Select value={ selectedProductId?.toString() || "" } onValueChange={(value) => {
+                                    const id = value ? Number(value) : null;
                                     setSelectedProductId(id);
                                     const selectedProduct = products.find(product => product.id === id);
                                     if (selectedProduct) {
                                         handleIdChange(selectedProduct);
                                         setNameUpdt(selectedProduct.nome);
-                                        setTypeUpdt(TipoProduto.find(type => type.id === selectedProduct.tipo) || "");
+                                        setTypeUpdt(TipoProduto.find(type => type.id === selectedProduct.tipo) || null);
                                         setDescriptionUpdt(selectedProduct.descricao);
-                                        setPreviewUrl(selectedProduct.fileUrl);
+                                        setPreviewUrl(selectedProduct.fileUrl || null);
                                     }
                                 }}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Selecione um produto" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {products.map((product) => (
-                                            <SelectItem key={product.id} value={product.id.toString()}>
+                                        {products
+                                            .filter((product) => product.id !== undefined)
+                                            .map((product) => (
+                                            <SelectItem key={product.id} value={product.id!.toString()}>
                                                 {product.nome}
                                             </SelectItem>
                                         ))}
@@ -496,7 +508,8 @@ export function Crud () {
 
                             <div>
                                 <Label htmlFor="typeUpdt">Tipo</Label>
-                                <Select value={typeUpdt === "" ? "" : typeUpdt.id.toString()} onValueChange={(value) => setTypeUpdt(value === "" ? "" : TipoProduto.find(tipo => tipo.id === Number(value)) || "")}>
+                                <Select value={typeUpdt?.id.toString() || "" } onValueChange={(value) =>
+                                        setTypeUpdt(value ? TipoProduto.find(tipo => tipo.id === Number(value)) || null : null)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Selecione um tipo" />
                                     </SelectTrigger>
@@ -568,8 +581,8 @@ export function Crud () {
                         <form onSubmit={handleDlt} className="space-y-4">
                             <div>
                                 <Label htmlFor="productsDlt">Selecione o produto para ser removido</Label>
-                                <Select value={dltProductId.toString()} onValueChange={(value) => {
-                                    const id = value ? Number(value) : "";
+                                <Select value={dltProductId?.toString() || ""} onValueChange={(value) => {
+                                    const id = value ? Number(value) : null;
                                     setDltProductId(id);
                                     const selectedProductDlt = products.find(product => product.id === id);
                                     if (selectedProductDlt) {
@@ -580,8 +593,10 @@ export function Crud () {
                                         <SelectValue placeholder="Selecione um produto" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {products.map((product) => (
-                                            <SelectItem key={product.id} value={product.id.toString()}>
+                                        {products
+                                            .filter((product) => product.id !== undefined)
+                                            .map((product) => (
+                                            <SelectItem key={product.id} value={product.id!.toString()}>
                                                 {product.nome}
                                             </SelectItem>
                                         ))}
