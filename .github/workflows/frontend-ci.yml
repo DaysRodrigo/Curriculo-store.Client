@@ -39,7 +39,7 @@ jobs:
         
       - name: Build
         run: |
-          if npm run | grep -q "build"; then npm run build else echo "Sem script build, pulando"; fi
+          if npm run | grep -q "build"; then npm run build; else echo "Sem script build, pulando"; fi
   
   docker-security:
     runs-on: ubuntu-latest
