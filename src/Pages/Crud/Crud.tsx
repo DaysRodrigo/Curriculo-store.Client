@@ -100,7 +100,7 @@ export function Crud () {
 
         try {
             setIsCreating(true);
-            let data: any = {
+            const data: any = {
                 nome: name,
                 tipo: type,
                 descricao: description,
@@ -109,12 +109,6 @@ export function Crud () {
             if ( file ) {
                 const publicUrl = await uploadFile(file);
                 data.fileUrl = publicUrl;
-                // data = {
-                //     nome: name,
-                //     tipo: type,
-                //     descricao: description,
-                //     fileurl: publicUrl,
-                // };
             }
             const response = await createProduct(data);
             if (response &&  response.status === 200) {
