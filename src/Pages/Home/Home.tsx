@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { getProducts } from "../../Services/ProductService";
 import { TipoProduto } from "@/Enums/TipoProduto";
 import { ShoppingCart, User, Code, Heart, Star, Moon, Sun } from "lucide-react";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Badge } from "@/Components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/Components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ThemeSelector }  from "@/Theme/ThemeSelector";
 import { useTheme } from "next-themes";
 
