@@ -1,8 +1,10 @@
-const apiUrl = import.meta.env.VITE_API_URL;
+import { API_URL } from "@/config/api";
+
+
 
 export const getProducts = async () => {
     try {
-        const response = await fetch(`${apiUrl}/api/produtos/all`, {
+        const response = await fetch(`${API_URL}/api/produtos/all`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -23,7 +25,7 @@ export const getProducts = async () => {
 
 export const getProductById = async (id: number) => {
     try {
-        const response = await fetch(`${apiUrl}/api/produtos/${id}`);
+        const response = await fetch(`${API_URL}/api/produtos/${id}`);
 
         if (!response.ok) {
             throw new Error(`Erro: ${response.status}`);
@@ -37,7 +39,7 @@ export const getProductById = async (id: number) => {
 
 export const createProduct = async (product: object) => {
     try {
-        const response = await fetch(`${apiUrl}/api/produtos`, {
+        const response = await fetch(`${API_URL}/api/produtos`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -59,7 +61,7 @@ export const createProduct = async (product: object) => {
 
 export const updateProduct = async (product: object, id: number) => {
     try {
-        const response = await fetch(`${apiUrl}/api/produtos/${id}`, {
+        const response = await fetch(`${API_URL}/api/produtos/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -81,7 +83,7 @@ export const updateProduct = async (product: object, id: number) => {
 
 export const deleteProduct = async (id: number) => {
     try {
-        const response = await fetch(`${apiUrl}/api/produtos/${id}`, {
+        const response = await fetch(`${API_URL}/api/produtos/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

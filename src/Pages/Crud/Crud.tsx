@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { TipoProduto } from "@/Enums/TipoProduto";
 import { uploadFile } from "@/Services/CloudService";
 import { getProducts, createProduct, updateProduct, deleteProduct } from "@/Services/ProductService";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { Textarea } from "@/Components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Car, ExternalLink, Upload } from "lucide-react";
+import { ExternalLink, Upload } from "lucide-react";
 
 interface Product {
     id: number;
@@ -89,7 +89,7 @@ export function Crud () {
             return;
         }
 
-        if ((type === 0 || type === 2) && !file) {
+        if ((type.id === 0 || type.id === 2) && !file) {
             toast({
                 variant: "destructive",
                 title: "Arquivo necessário",
