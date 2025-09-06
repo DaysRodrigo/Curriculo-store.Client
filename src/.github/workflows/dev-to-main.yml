@@ -1,4 +1,4 @@
-name: Merge Dev → Main e Deploy
+name: Merge Dev -> Main
 
 on:
   workflow_run:
@@ -22,18 +22,3 @@ jobs:
           source_branch: dev
           target_branch: main
           merge_method: merge  # pode ser merge, squash ou rebase
-
-      # Deploy (exemplo DigitalOcean App ou VPS via SSH)
-      # - name: Deploy via SSH
-      #   uses: appleboy/ssh-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USER }}
-      #     key: ${{ secrets.SSH_KEY }}
-      #     port: ${{ secrets.SSH_PORT }}
-      #     script: |
-      #       cd /caminho/do/projeto
-      #       git pull origin main
-      #       npm install --production
-      #       npm run build
-      #       pm2 restart all # ou o comando que você usa pra rodar seu app
