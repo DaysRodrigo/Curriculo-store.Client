@@ -19,6 +19,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
+      host: "0.0.0.0",
+      port: 3000,
       proxy: mode === 'development' ? {
         '/api': {
           target: 'http://localhost:7233',
@@ -26,6 +28,11 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
       } : undefined
+    },
+    resolve: {
+      alias: {
+        '@': '/src',
+      },
     }
   }
 })

@@ -1,12 +1,15 @@
 import React from "react";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Alert, AlertDescription } from "@/Components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import '../../Styles/Global.css';
-import styles from './Login.module.css';
-import imgLogin from '../../assets/images/13108.jpg';
 import { login } from "../../Services/LoginService";
 import { jwtDecode } from "jwt-decode";
 
-interface user {
+interface User {
     name: string;
     email: string;
     tipo: number;
@@ -16,14 +19,17 @@ interface user {
 
 interface JwtPayload {
     exp: number;
+    tipo: number;
     [key: string]: any;
 }
 
-const Login = () => {
+export function Login () {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+    const [isLoading, setIsLoading] = React.useState(false);
     const navigate = useNavigate();
+    const { toast } = useToast();
 
     React.useEffect(() => {
         const token = localStorage.getItem("token");
@@ -78,14 +84,23 @@ const Login = () => {
                 document.getElementById("password")?.focus();
             }
             return;
-        } 
+        }
+
+        setIsLoading(true);
+        setErrorMessage(null);
+
         try {
             const response = await login(email, password);
             if (response) { 
-                const user: user = response;
+                const user: User = response as User;
 
                 localStorage.setItem("user", JSON.stringify(user));
                 localStorage.setItem("token", user.token);
+
+                toast({
+                    title: "Login successefull.",
+                    description: `Welcome, ${user.name}`,
+                })
 
                 if ( (user.tipo === 2 || user.tipo === 1) && isTokenValid()) {
                     navigate("/crud");
@@ -99,33 +114,92 @@ const Login = () => {
             }
             
         } catch (error: any) {
-            setErrorMessage(null);
             setErrorMessage("Erro ao fazer login: " + error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
 
-    return (
-        <>
-            <div className="bg-white flex flex-col items-center min-h-screen justify-center">
-                <div className="mt-5 m-2">
-                    <img src={imgLogin} alt="Imagem de Login" className="h-96 rounded-lg" />
-                </div>
-                <div className={`${styles.cardLogin}`}>
-                    {errorMessage && (<div className="text-red-500 text-sm p-1">{errorMessage}</div>)}
-                    <form className={`${styles.formLogin} flex flex-col`} onSubmit={(handleSubmit)}>
-                        <label className="text-black" htmlFor="email">Email</label>
-                        <input type="email" id="email" name="email" className={`${styles.inputLogin}`} 
-                        onChange={e => setEmail(e.target.value)} value={email} />
-                        <label className="text-black" htmlFor="password">Password</label>
-                        <input type="password" id="password" name="password" className={`${styles.inputLogin}`}
-                        onChange={e => setPassword(e.target.value)} value={password} />
-                        <button type="submit" className={`${styles.btnLg}`}>Login</button>
-                    </form>
-                </div>
-            </div>
-        </>
-    );
-};
+    // return (
+    //     <>
+    //         <div className="bg-white flex flex-col items-center min-h-screen justify-center">
+    //             <div className="mt-5 m-2">
+    //                 <img src={imgLogin} alt="Imagem de Login" className="h-96 rounded-lg" />
+    //             </div>
+    //             <div className="">
+    //                 {errorMessage && (<div className="text-red-500 text-sm p-1">{errorMessage}</div>)}
+    //                 <form className="" onSubmit={(handleSubmit)}>
+    //                     <label className="text-black" htmlFor="email">Email</label>
+    //                     <input type="email" id="email" name="email" className="" 
+    //                     onChange={e => setEmail(e.target.value)} value={email} />
+    //                     <label className="text-black" htmlFor="password">Password</label>
+    //                     <input type="password" id="password" name="password" className=""
+    //                     onChange={e => setPassword(e.target.value)} value={password} />
+    //                     <button type="submit" className="">Login</button>
+    //                 </form>
+    //             </div>
+    //         </div>
+    //     </>
+    // );
 
-export default Login;
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
+            <div className="w-full max-w-md space-y-6">
+                <Card>
+                    <CardHeader className="space-y-1">
+                        <CardTitle className="text-2xl text-center">Login</CardTitle>
+                        <CardDescription className="text-center">
+                            Entre com suas credenciais para acessar sua conta
+                        </CardDescription>
+                    </CardHeader>
+
+                    <CardContent>
+                        {errorMessage && (
+                            <Alert variant="destructive" className="mb-4">
+                                <AlertDescription>{errorMessage}</AlertDescription>
+                            </Alert>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                id="email"
+                                type="email"
+                                placeholder="seu@email.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={isLoading}
+                                required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="password">Senha</label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    disabled={isLoading}
+                                    required 
+                                />
+                            </div>
+
+                            <Button
+                                type="submit"
+                                className="w-full"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? "Entrando..." : "Entrar"}
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
+
+        </div>
+    )
+
+};

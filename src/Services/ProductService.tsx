@@ -2,7 +2,13 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export const getProducts = async () => {
     try {
-        const response = await fetch(`${apiUrl}/api/produtos/all`);
+        const response = await fetch(`${apiUrl}/api/produtos/all`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error(`Erro: ${response.status}`);

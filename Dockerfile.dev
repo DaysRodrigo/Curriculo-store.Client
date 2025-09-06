@@ -1,9 +1,12 @@
-FROM node:20-alpine
+FROM node:20
 WORKDIR /app
 
 # Copia apenas package.json e package-lock.json
 COPY package*.json ./
-RUN npm install
+
+# Instala as dependências do zero
+RUN npm install --legacy-peer-deps --no-optional
+
 
 # Copia todo o código
 COPY . .
@@ -12,4 +15,4 @@ COPY . .
 EXPOSE 3000
 
 # Rodando em modo desenvolvimento (hot-reload)
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
