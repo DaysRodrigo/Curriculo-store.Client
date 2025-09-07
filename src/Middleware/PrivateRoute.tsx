@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 
 interface JwtPayload {
     exp: number;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 const isTokenValid = () => { 

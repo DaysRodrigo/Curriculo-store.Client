@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../../Services/ProductService";
-import '../../Styles/Global.css';
-import styles from './Home.module.css';
-import imgAbout from '../../assets/images/13105c.png';
-import imgExp from '../../assets/images/13109.png';
-import imgAcademic from '../../assets/images/13110.png';
-import imgCourse from '../../assets/images/13111.png';
-import imgOther from '../../assets/images/13112.png';
-import { TipoProduto } from "../../Enums/TipoProduto";
-// import Modal from "../Modal/ProductModal";
-import Header from "../Header/Header";
+import { TipoProduto } from "@/Enums/TipoProduto";
+import { ShoppingCart, User, Code, Heart, Star, Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ThemeSelector }  from "@/Theme/ThemeSelector";
+import { useTheme } from "next-themes";
 
 
 interface Product {
@@ -18,199 +16,279 @@ interface Product {
     descricao: string;
     tipo: number;
     fileUrl: string;
+    valor: number;
+    instituicao: string;
+    tecnologiasList: string[];
+    periodo: string;
+    
 }
 
-interface HomeProps {
-    cartItems: Product[];
-    setCartItems: React.Dispatch<React.SetStateAction<Product[]>>;
-    toggleCart: () => void;
-    isCartOpen: boolean;
-}
-const Home = ({ cartItems, setCartItems, toggleCart, isCartOpen }: HomeProps) => {
+export function Home  () {
+    const [cart, setCart] = useState<Product[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<TipoProduto["id"] | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-    // const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct ] = useState<Product>();
+    const { setTheme, resolvedTheme  } = useTheme();
 
 
-
-
-
-    const imageMap: { [key: number]: string } = {
-        [TipoProduto.Curso]: imgCourse,
-        [TipoProduto.Experiência]: imgExp,
-        [TipoProduto.Acadêmico]: imgAcademic,
-        [TipoProduto.Outro]: imgOther,
-    };
-
-    const tipoProdutoMap: { [key: number]: string } = {
-        [TipoProduto.Acadêmico]: "Formação Acadêmica",
-        [TipoProduto.Experiência]: "Experiência",
-        [TipoProduto.Curso]: "Certificação",
-        [TipoProduto.Outro]: "Outro"
+    const addToCart = (item: Product) => {
+        setCart([...cart, item]);
     };
 
     useEffect(() => {
         const getProduct = async () => {
             const data = await getProducts();
             setProducts(data);
-            setFilteredProducts(data);
         };
 
         getProduct();
     }, []);
-
-    const handleProductClick = async (id: number) => {
-        localStorage.setItem("id", id.toString());
-        const product = products.find( product => product.id === id);
-        setSelectedProduct(product);
-        // setIsModalOpen(true);
-    }
-
-
-    const handleCartClick = (productId: number) => {
-          const productToAdd = products.find(p => p.id === productId);
-          if (!productToAdd) return;
-
-          if (cartItems.find(p => p.id === productId)) {
-              alert('Produto já está no carrinho!');
-              return;
-          }
-        setCartItems(prev => [...prev, productToAdd]);
-    }
-
+        
+    const filteredItems = selectedCategory != null
+        ? products.filter(product => product.tipo === selectedCategory)
+        : products;
+        
     return (
-        <>
-        <Header 
-            toggleCart={toggleCart} 
-            cartItems={cartItems}
-            isCartOpen={isCartOpen} 
-            setCartItems={setCartItems}
-        />
-            <div className="flex justify-center justify-items-center h-96 about-me p-5">
-                <div className={`${styles.aboutCard}`}>
-                    <h3>Um pouco sobre mim:</h3>
-                    <p className="p-1 m-1">
-                        Me chamo Rodrigo Dias Sales, tenho 31 anos e sou do Rio de Janeiro.
-                        Tenho por volta de 4 anos de experiência na área de tecnologia,
-                        fui estagiário por um ano e depois trabalhei como desenvolvedor júnior por 3 anos.
-                        Nesse momento estou procurando um oportunidade de evoluir mais e mostrar meu valor.
-                        Seguindo esse projeto, você vai poder ver com o que trabalhei, e o que eu gostaria de trabalhar.
-                    </p>
-                </div>
-            </div>
-             <div className="navbar shadow-sm flex-grow flex flex-col products-section">
-                <div className={`${styles.carousel} gap-4 p-5`}>
-                        {filteredProducts.map((product) => (
-                            <div className={`carousel-item ${styles.card}`} key={product.id}>
-                                <div className="card-body flex flex-col items-center">
-                                    <div id="image" onClick={() => handleProductClick(product.id)}>
-                                        <img src={imageMap[product.tipo]} alt="Course image"/>
-                                    </div>
-                                    <div id="name">
-                                        <h2 title={product.nome}>
-                                        {product.nome.length > 20 ? product.nome.substring(0, 20) + '...' : product.nome}
-                                        </h2>
+            <div className="min-h-screen bg-background">
+                {/* Header */}
+                <header className="sticky top-0 z-50 w-full border-b bg-background/95 bacldro-blur sipports-[backdrop-filter]:bg-background/60">
+                    <div className="container flex h-16 items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <User className="h-6 w-6 text-primary" />
+                            <h1 className="text-xl font-bold">CV Store</h1>
+                        </div>
+                        <nav className="hidden md:flex items-center gap-6">
+                            <Button variant="ghost" onClick={() => setSelectedCategory(null)}>
+                                All Items
+                            </Button>
+                            {TipoProduto.map(type => (
+                                <Button
+                                    key={type.id}
+                                    variant="ghost"
+                                    onClick={() => setSelectedCategory(type.id)}
+                                    className={selectedCategory === type.id ? 'bg-accent' : ''}
+                                >
+                                    <type.icon className="h-4 w-4 mr-2" />
+                                    {type.name}
+                                </Button>
+                            ))}     
+                        </nav>
+                        <ThemeSelector />
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                            >
+                            {resolvedTheme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                        </Button>
 
-                                    </div>
-                                    <button className="rounded btn" onClick={() => handleCartClick(product.id)}>Adicionar ao carrinho</button>
+                        <Button variant="outline" className="relative">
+                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            Cart
+                            {cart.length > 0 && (
+                                <Badge className="absolute -top-2 -fight-2 h-5 w-5 rounded-full p-0 flex items-center justify-center">
+                                    {cart.length}
+                                </Badge>
+                            )}
+                        </Button>
+                    </div>
+                </header>
+
+                <main className="container py-8">
+                    {/* Explain Section */}
+                    <section className="text-center py-16 mb-12 rounded-lg bg-gradient-to-r from-primary/5 to-background">
+                        <h2 className="text-4xl font-bold mb-4">
+                            Welcome to CV Store!
+                        </h2>
+                        <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
+                            Explore my CV in a unique way. Each item represents an experience, knowledge, or achievement in my academic and professional career.
+                        </p>
+                        <div className="flex justify-center gap-4">
+                            <Button size="lg">
+                                <Heart className="h-4 w-4 mr-2" />
+                                Explore Items
+                            </Button>
+                            <Button variant="outline" size="lg">
+                                About the Project
+                            </Button>    
+                        </div>
+                    </section>
+
+                    {/* Category Filter */}
+                    <section className="mb-8">
+                        <h3 className="text-2xl font-bold mb-6">Categories</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {TipoProduto.map(type => (
+                                <Card
+                                    key={type.id}
+                                    className={`cursor-pointer transition-all hover:shadow-md ${
+                                        selectedCategory === type.id ? 'ring-2 ring-primary' : ''
+                                    }`}
+                                    onClick={() => setSelectedCategory(type.id)}
+                                >
+                                    <CardContent className="flex flex-col items-center p-6">
+                                        <div className={`p-3 rounded-full ${type.color} text-white mb-3`}>
+                                            <type.icon className="h-6 w-6" />
+                                        </div>
+                                        <h4 className="font-semibold text-center">{type.name}</h4>
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                            {products.filter(product => product.tipo == type.id).length} items
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </section>
+
+
+                    {/* Product's Grid*/}
+                    <section>
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-2xl font-bold">
+                                {selectedCategory != null
+                                    ? TipoProduto.find( type => type.id === selectedCategory)?.name
+                                    : 'All Items'
+                                }
+                            </h3>
+                            <p className="text-muted-foreground">
+                                {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredItems.map( product => (
+                                <Card key={product.id} className="group hover:shadow-lg transition-all duration-300">
+                                    <CardHeader>
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <CardTitle className="text-lg mb-2">{product.nome}</CardTitle>
+                                                <CardDescription className="flex items-center gap-2">
+                                                    <span>{product.instituicao}</span>
+                                                    <Badge variant="outline">{product.periodo || '-'}</Badge>
+                                                </CardDescription>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-2xl font-bold text-primary">R${product.valor}</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                                            {product.descricao}
+                                        </p>
+                                        <div className="flex flex-wrap gap-1 mb-4">
+                                            {product.tecnologiasList?.map((skill: string, i: number) => ( 
+                                                <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
+                                            ))}
+
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex-1"
+                                                onClick={() => setSelectedProduct(product)}
+                                            >
+                                                Details
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                className="flex-1"
+                                                onClick={() => addToCart(product)}
+                                            >
+                                                <ShoppingCart className="h-4 w-4 mr-2" />
+                                                Add
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* About Project */}
+                    <section className="mt-16 py-12 bg-muted/30 rounded-lg">
+                        <div className="text-center mb-8">
+                            <h3 className="text-3xl font-bold mb-4">About This Project</h3>
+                            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                               This is a conceptual project, which transforms a traditional CV into an
+                               e-commerce interactive experience, where each 'product' represents an experience,
+                               skill, or real achievement of my career.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                            <div className="text-center">
+                                <div className="bg-primary/10 p-4 rounded-full 2-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                    <Star className="h-8 w-8 text-primary" />
                                 </div>
-                            </div>
-                        ))}
-                </div>
-            </div>
-            <div className={`flex mt-10`}>
-                <div className={`${styles.aboutContent}`}>
-                    <img className={`${imgAbout}`} src={imgAbout}></img>
-                </div>
-                <div className={`${styles.aboutCard}`}>
-                    <h3>Sobre o projeto:</h3>
-                    <p className="p-1 m-1">A idéia surgiu de uma necessidade de montar uma projeto onde eu
-                        pudesse mostrar uma grande parte do que sei e trabalhei, junto com algo que nunca fiz.
-                        Como eu já queria fazer um currículo online, e nunca tinha feito nada parecido com um
-                        marketplace, pensei em juntar os dois.
-                        O foco do projeto é simular uma loja com o meu currículo.
-                        Onde os itens do meu currículo são os produtos, como formação acadêmica, 
-                        experiência, certificações e outros.
-                        O projeto foi feito em React, TypeScript e Tailwind CSS no front,
-                        e .Net no back. Também utilizei banco PostGree Sql e AWS para salvar os arquivos.
-                    </p>
-                </div>
-            </div>
-            <input
-                type="checkbox"
-                id="product-modal"
-                className="modal-toggle"
-                checked={!!selectedProduct}
-                readOnly
-            />
-            <label
-                htmlFor="product-modal"
-                className="modal cursor-pointer"
-                onClick={() => setSelectedProduct(undefined)}
-            >
-                <label className="modal-box relative bg-white/80" htmlFor="">
-                    {selectedProduct && (
-                        <>
-                            <h2 className="text-2xl font-bold mb-4">{selectedProduct.nome}</h2>
-                            <div className="mb-3">
-                                <span className="font-semibold">Categoria: </span>
-                                <span>{tipoProdutoMap[selectedProduct.tipo]}</span>
-                            </div>
-                            <div className="mb-5">
-                                <span className="font-semibold">Descrição:</span>
-                                <p className="mt-1 max-h-40 overflow-auto text-justify">
-                                    {selectedProduct.descricao}
+                                <h4 className="font-semibold mb-2">Unique Experience</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    An innovative way of showing achievements and skills
                                 </p>
                             </div>
-                            <a
-                                href={selectedProduct.fileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 w-fit"
-                            >
-                                Ver Arquivo
-                            </a>
-                        </>
-                    )}
-                    <button
-                        className="btn btn-sm btn-circle absolute right-2 top-2"
-                        onClick={() => setSelectedProduct(undefined)}
-                    >
-                        ✕
-                    </button>
-                </label>
-            </label>
-            {/* {isModalOpen && selectedProduct &&(
-               <Modal onClose={() => setIsModalOpen(false)}>
-                   <div className={`${styles.mdDiv}`}>
-                       <h2 className="text-2xl font-bold mb-4">{selectedProduct.nome}</h2>
+                            <div className="text-center">
+                                <div className="bg-primary/10 p-4 rounded-full 2-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                    <Code className="h-8 w-8 text-primary" />
+                                </div>
+                                <h4 className="font-semibold mb-2">Technology</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Developed with React, TypeScript and .NET
+                                </p>
+                            </div>
+                            <div className="text-center">
+                                <div className="bg-primary/10 p-4 rounded-full 2-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                    <Heart className="h-8 w-8 text-primary" />
+                                </div>
+                                <h4 className="font-semibold mb-2">Creativity</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Showing skills in a creative way and thinking outside the box
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                </main>
 
-                       <div className="mb-3">
-                           <span className="font-semibold">Categoria: </span>
-                           <span>{tipoProdutoMap[selectedProduct.tipo]}</span>
-                       </div>
+                {/* Modal */}
+                <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>{selectedProduct?.nome}</DialogTitle>
+                            <DialogDescription>
+                                {selectedProduct?.instituicao}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <div>
+                                <h4 className="font-semibold mb-2">Description</h4>
+                                <p className="text-muted-foreground">{selectedProduct?.descricao}</p>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold mb-2">Skills Developed</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedProduct?.tecnologiasList?.map((skill: string, i: number) => ( 
+                                        <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between pt-4 border-t">
+                                <div>
+                                    <p className="text-2xl font-bold text-primary">R${selectedProduct?.valor}</p>
+                                    <p className="text-sm text-muted-foreground">Symbolic Value</p>
+                                </div>
+                                <Button
+                                    onClick={() => {
+                                        if (selectedProduct) addToCart(selectedProduct);
+                                    }}
+                                    disabled={!selectedProduct}
+                                >
+                                    <ShoppingCart className="h-4 w-4 mr-2" />
+                                    Add to Cart
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
 
-                       <div className="mb-5">
-                           <span className="font-semibold">Descrição:</span>
-                           <p className="mt-1 max-h-40 overflow-auto text-justify">
-                               {selectedProduct.descricao}
-                           </p>
-                       </div>
-
-                       <a 
-                           href={selectedProduct.fileUrl} 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 w-fit"
-                       >
-                           Ver Arquivo
-                       </a>
-                   </div>
-               </Modal>
-           )} */}
-        </>
-    );
-};
-
-export default Home;
+            </div>
+        )
+}
