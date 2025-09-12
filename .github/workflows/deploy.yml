@@ -27,6 +27,6 @@ jobs:
             cd /home/ec2-user/Curriculo-Store/Curriculo-store.Client
             git pull origin main
             cd /home/ec2-user/Curriculo-Store
-            docker compose -f docker-compose.prod.yml build frontend
-            docker compose -f docker-compose.prod.yml up -d frontend
+            docker-compose -f docker-compose.prod.yml build frontend
+            docker-compose -f docker-compose.prod.yml up -d frontend
           EOF
