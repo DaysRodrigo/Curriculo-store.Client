@@ -40,8 +40,9 @@ export function Home  () {
         const getProduct = async () => {
             const data = await getProducts();
             data.forEach((products: Product) => {
-                products.tecnologiasArray  = products.tecnologias.split(",");
-            });
+                products.tecnologiasArray = products.tecnologias 
+                    ? products.tecnologias.split(",") 
+                    : [];            });
             setProducts(data);
         };
 
