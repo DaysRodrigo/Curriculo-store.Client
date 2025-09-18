@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type ThemeVariant = 'vibrant' | 'warm' | 'minimal';
+type ThemeVariant = 'vibrant' | 'warm' | 'minimal' | 'light' | 'dark';
 
 interface ThemeContextType {
     theme: ThemeVariant;
@@ -48,19 +48,31 @@ const themeVariables = {
         '--success': '142 76% 36%',
         '--warning': '38 92% 50%',
         '--info': '210 100% 56%' 
-    }
+    },
+    light: {}, dark: {}
 };
 
 export function CustomThemeProvider({ children }: { children: React.ReactNode}) {
     const [ theme, setTheme ] = useState<ThemeVariant>('vibrant');
 
     useEffect(() => {
-        const root = document.documentElement;
-        const variables = themeVariables[theme];
+        // const root = document.documentElement;
+        // const variables = themeVariables[theme];
 
-        Object.entries(variables).forEach(([property, value]) => {
-            root.style.setProperty(property, value);
-        });
+        // Object.entries(variables).forEach(([property, value]) => {
+        //     root.style.setProperty(property, value);
+        // });
+        const root = document.documentElement;
+    
+        if (theme === 'light' || theme === 'dark') {
+            root.classList.remove('light', 'dark');
+            root.classList.add(theme);
+        } else {
+            const variables = themeVariables[theme];
+            Object.entries(variables).forEach(([property, value]) => {
+                root.style.setProperty(property, value);
+            });
+        }
     }, [theme]);
 
     return (
