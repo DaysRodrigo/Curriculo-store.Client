@@ -18,7 +18,8 @@ interface Product {
     fileUrl: string;
     valor: number;
     instituicao: string;
-    tecnologiasList: string[];
+    tecnologias?: string;
+    tecnologiasArray?: string[];
     periodo: string;
     
 }
@@ -38,6 +39,8 @@ export function Home  () {
     useEffect(() => {
         const getProduct = async () => {
             const data = await getProducts();
+            data.forEach((products: Product) => {
+                products.tecnologiasArray = products.tecnologias?.split(",")})
             setProducts(data);
         };
 
@@ -77,9 +80,9 @@ export function Home  () {
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                            onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
                             >
-                            {resolvedTheme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                            {resolvedTheme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                         </Button>
 
                         <Button variant="outline" className="relative">
@@ -177,7 +180,7 @@ export function Home  () {
                                             {product.descricao}
                                         </p>
                                         <div className="flex flex-wrap gap-1 mb-4">
-                                            {product.tecnologiasList?.map((skill: string, i: number) => ( 
+                                            {product.tecnologiasArray?.map((skill: string, i: number) => ( 
                                                 <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
                                             ))}
 
@@ -265,7 +268,7 @@ export function Home  () {
                             <div>
                                 <h4 className="font-semibold mb-2">Skills Developed</h4>
                                 <div className="flex flex-wrap gap-2">
-                                    {selectedProduct?.tecnologiasList?.map((skill: string, i: number) => ( 
+                                    {selectedProduct?.tecnologiasArray?.map((skill: string, i: number) => ( 
                                         <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
                                     ))}
                                 </div>

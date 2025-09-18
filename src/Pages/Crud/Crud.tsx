@@ -17,6 +17,23 @@ interface Product {
     descricao: string;
     tipo: number;
     fileUrl?: string;
+    instituicao: string;
+    valor: number;
+    tecnologias: string;
+    tecnologiasArray?: string[];
+    periodo?: string;
+}
+
+interface ProductUpdt {
+    id?: number;
+    nome: string;
+    descricao: string;
+    tipo: number;
+    fileUrl?: string;
+    instituicao: string;
+    valor: number;
+    tecnologias: string[];
+    periodo?: string;
 }
 
 export function Crud () {
@@ -25,6 +42,11 @@ export function Crud () {
     const [type, setType] = useState<TipoProduto | null>(null);
     const [description, setDescription] = React.useState("");
     const [file, setFile] = React.useState<File | null>(null);
+    const [instituition, setInstituition] = React.useState("");
+    const [techs, setTechs] = React.useState<string[]>([]);
+    const [techInput, setTechInput] = React.useState<string>('');
+    const [period, setPeriod] = React.useState("");
+    const [value, setValue] = React.useState<number | null>(null);
     const [isCreating, setIsCreating] = useState(false);
 
     //Update
@@ -33,6 +55,11 @@ export function Crud () {
     const [descriptionUpdt, setDescriptionUpdt] = React.useState("");
     const [updateFile, setUpdateFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [instituitionUpdt, setInstituitionUpdt] = React.useState("");
+    const [techsUpdt, setTechsUpdt] = React.useState<string[]>([]);
+    const [techInputUpdt, setTechInputUpdt] = React.useState<string>('');
+    const [periodUpdt, setPeriodUpdt] = React.useState("");
+    const [valueUpdt, setValueUpdt] = React.useState<number | null>(null);
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
 
@@ -52,17 +79,13 @@ export function Crud () {
     }
     
     useEffect(() => {
-        // const getProduct = async () => {
-        //     const data: Array<Product> = await getProducts();
-        //     setProducts(data);
-        // };
-
-        // getProduct();
-
         const getProduct = async () => {
             try {
                 setIsLoading(true);
                 const data: Array<Product> = await getProducts();
+                data.forEach((products: Product) => {
+                    products.tecnologiasArray  = products.tecnologias.split(",");
+                });
                 setProducts(data);
             } catch (error: unknown) {
                 if( error instanceof Error ) {
@@ -79,10 +102,33 @@ export function Crud () {
 
         getProduct();
     }, [toast]);
-    
+
+
+    const addTech = () => {
+        if (techInput.trim() !== '') {
+            setTechs([...techs, techInput.trim()]);
+            setTechInput('');
+        }
+    };
+
+    const removeTech = (index: number) => {
+        setTechs(techs.filter((_, i) => i !== index));
+    };
+
+    const addTechUpdt = () => {
+        if (techInputUpdt.trim() !== '') {
+            setTechsUpdt([...techsUpdt, techInputUpdt.trim()]);
+            setTechInputUpdt('');
+        }
+    };
+
+    const removeTechUpdt = (index: number) => {
+        setTechsUpdt(techsUpdt.filter((_, i) => i !== index));
+    };
+        
     const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!name || description.trim() === "" || type === null ) {
+        if (!name || description.trim() === "" || type === null || value === null) {
             toast({
                 variant: "destructive",
                 title: "Campos obrigatórios",
@@ -100,12 +146,25 @@ export function Crud () {
             return;
         }
 
+        if ( !techs ) {
+            toast({
+                variant: "destructive",
+                title: "Tecnologia necessária",
+                description: "É necessário selecionar as tecnologias"
+            });
+            return;
+        }
+
         try {
             setIsCreating(true);
-            const data: Product = {
+            const data: ProductUpdt = {
                 nome: name,
                 tipo: type.id,
                 descricao: description,
+                instituicao: instituition,
+                valor: value,
+                periodo: period,
+                tecnologias: techs
             };
 
             if ( file ) {
@@ -123,6 +182,10 @@ export function Crud () {
                 setName("");
                 setType(null);
                 setDescription("");
+                setValue(null);
+                setPeriod("");
+                setInstituition("");
+                setTechs([]);
                 setFile(null);
 
                 //Reload products
@@ -150,7 +213,9 @@ export function Crud () {
 
     const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!nameUpdt || typeUpdt === null || !updateFile || !descriptionUpdt) {
+        
+        if (!nameUpdt || typeUpdt === null || !descriptionUpdt || (typeUpdt.id === 2 && !updateFile )) {
+            console.log('Chegou no erro');
             toast({
                 variant: "destructive",
                 title: "Campos obrigatórios",
@@ -158,17 +223,25 @@ export function Crud () {
             });
             return;
         }
-
         try {
             setIsUpdating(true);
-            const publicUrl = await uploadFile(updateFile);
-            setPreviewUrl(publicUrl);
+            let fileUrl = previewUrl;
+            
+            if (updateFile) {
+                const publicUrl = await uploadFile(updateFile);
+                fileUrl = publicUrl;
+                setPreviewUrl(publicUrl);
+            }
             const id = Number(localStorage.getItem('selectedId'));
-            const data: Product = {
+            const data: ProductUpdt = {
                 nome: nameUpdt,
                 tipo: typeUpdt ? typeUpdt.id : 0,
-                fileUrl: publicUrl,
+                fileUrl: fileUrl || '',
                 descricao: descriptionUpdt,
+                tecnologias: techsUpdt,
+                valor: valueUpdt ? valueUpdt : 0,
+                periodo: periodUpdt,
+                instituicao: instituitionUpdt
             }
             
             const response = await updateProduct(data, id);
@@ -258,131 +331,6 @@ export function Crud () {
             </div>
         );
     }
-    // return (
-    //     <>
-    //     <section className="bg-yellow-50 flex flex-row justify-center justify-items-center">
-    //             <div className="">
-    //                 {errorMessage && (<div className="text-red-500 text-sm p-1">{errorMessage}</div>)}
-    //                 <form className={`flex flex-col`} onSubmit={handleCreate}>
-    //                     <h2 className="text-black text-base">Cadastro de Produtos</h2>
-    //                     <label className="text-black" htmlFor="name">Nome</label>
-    //                     <input type="text" id="name" name="name" className={` p-1 m-1 rounded`} 
-    //                     onChange={e => setName(e.target.value)} value={name} />
-    //                     <label className="text-black" htmlFor="type">Tipo</label>
-    //                     <select id="type" name="type" className={` p-1 m-1 rounded`}
-    //                     onChange={e => setType(e.target.value === "" ? "" : Number(e.target.value) as TipoProduto)} value={type}>
-    //                             <option value="">Selecione um tipo</option>
-    //                             { Object.entries(TipoProduto).map(([label, value]) => (
-    //                                 <option key={value} value={value}>
-    //                                 {label}
-    //                                 </option>
-    //                             ))}
-    //                     </select>
-    //                     <label className="text-black" htmlFor="description">Descrição</label>
-    //                     <textarea id="description" name="description" className={` p-7 m-1 rounded`}
-    //                     onChange={e => setDescription(e.target.value)} value={description} /> 
-    //                     <label className="text-black" htmlFor="fileurl">Arquivo</label>
-    //                     <input type="file" id="fileurl" name="fileurl" className={` p-1 m-1 rounded`}
-    //                     onChange={e => {
-    //                     const selectedFile = e.target.files?.[0];
-    //                         if (selectedFile) {
-    //                             setFile(selectedFile);
-    //                         }
-    //                     }} />
-    //                     <button type="submit" className="">Enviar</button>
-    //                 </form>
-    //             </div>
-    //             <div className="">
-    //                 {errorMessageUpdt && (<div className="text-red-500 text-sm p-1">{errorMessageUpdt}</div>)}
-    //                 <form className={`flex flex-col`} onSubmit={handleUpdate}>
-    //                     <h2 className="text-black text-base">Atualização de Produtos</h2>
-    //                     <label className="text-black" htmlFor="products">Selecione o produto para atualizar:</label>
-    //                     <select id="products" name="products" className={` p-1 m-1 rounded`}
-    //                     onChange={e => { const id = e.target.value ? Number(e.target.value) : "";
-    //                         setSelectedProductId(id);
-    //                         const selectedProduct = products.find(product => product.id === id);
-    //                         if (selectedProduct) {
-    //                             handleIdChange(selectedProduct)
-    //                             setNameUpdt(selectedProduct.nome);
-    //                             setTypeUpdt(Number(selectedProduct.tipo) as TipoProduto);
-    //                             setDescriptionUpdt(selectedProduct.descricao);
-    //                             setPreviewUrl(selectedProduct.fileUrl);
-    //                         }
-    //                     }}
-    //                     value={selectedProductId}
-    //                     >
-    //                             <option value="" disabled>Selecione um produto</option>
-    //                             {products.map((product) => (
-    //                                 <option key={product.id} value={product.id}>
-    //                                     {product.nome}
-    //                                 </option>
-    //                             ))}
-    //                     </select>
-    //                     <label className="text-black" htmlFor="nameUpdt">Nome</label>
-    //                     <input type="text" id="nameUpdt" name="nameUpdt" className={` p-1 m-1 rounded`} 
-    //                     onChange={e => setNameUpdt(e.target.value)} value={nameUpdt} />
-    //                     <label className="text-black" htmlFor="typeUpt">Tipo</label>
-    //                     <select id="typeUpt" name="typeUpt" className={` p-1 m-1 rounded`}
-    //                     onChange={e => setTypeUpdt(e.target.value === "" ? "" : Number(e.target.value) as TipoProduto)} value={typeUpdt}>
-    //                             <option value="">Selecione um tipo</option>
-    //                             { Object.entries(TipoProduto).map(([label, value]) => (
-    //                                 <option key={value} value={value}>
-    //                                 {label}
-    //                                 </option>
-    //                             ))}
-    //                     </select>
-    //                     <label className="text-black" htmlFor="descriptionUpdt">Descrição</label>
-    //                     <textarea id="descriptionUpdt" name="descriptionUpdt" className={` p-7 m-1 rounded`}
-    //                     onChange={e => setDescriptionUpdt(e.target.value)} value={descriptionUpdt} /> 
-    //                     <label className="text-black" htmlFor="previewUrl">Arquivo</label>
-    //                     {previewUrl && (
-    //                         <div className="mt-2">
-    //                             <a href={previewUrl} target="_blank" rel="noopener noreferrer">
-    //                             Visualizar arquivo atual
-    //                             </a>
-    //                         </div>
-    //                     )}
-    //                     <input type="file" id="previewUrl" name="previewUrl" className={` p-1 m-1 rounded`}
-    //                     onChange={e => {
-    //                     const selectedFile = e.target.files?.[0];
-    //                         if (selectedFile) {
-    //                             setUpdateFile(selectedFile);
-    //                         }
-    //                     }} />
-    //                     <button type="submit"  className="">Enviar</button>
-    //                 </form>
-    //             </div>
-    //             <div className="">
-    //                 {errorMessageDlt && (<div className="text-red-500 text-sm p-1">{errorMessageDlt}</div>)}
-    //                 <form className={`flex flex-col`} onSubmit={handleDlt}>
-    //                     <h2 className="text-black text-base">Exclusão de Produtos</h2>
-    //                     <label className="text-black" htmlFor="productsDlt">Selecione o produto para ser removido:</label>
-    //                     <select id="productsDlt" name="productsDlt" className={` p-1 m-1 rounded`}
-    //                     onChange={e => { const id = e.target.value ? Number(e.target.value) : "";
-    //                         setDltProductId(id);
-    //                         const selectedProductDlt = products.find(product => product.id === id);
-    //                         if (selectedProductDlt) {
-    //                             setNameDlt(selectedProductDlt.nome);
-    //                         }
-    //                     }}
-    //                     value={dltProductId}
-    //                     >
-    //                             <option value="" disabled>Selecione um produto</option>
-    //                             {products.map((product) => (
-    //                                 <option key={product.id} value={product.id}>
-    //                                     {product.nome}
-    //                                 </option>
-    //                             ))}
-    //                     </select>
-    //                     <label className="text-black" htmlFor="nameDlt">Nome</label>
-    //                     <input type="text" id="nameDlt" name="nameDlt" className={` p-1 m-1 rounded`} 
-    //                     onChange={e => setNameDlt(e.target.value)}  value={nameDlt} />
-    //                     <button type="submit"  className="">Enviar</button>
-    //                 </form>
-    //             </div>
-    //     </section>
-    //     </>
-    // );
 
     return (
         <div className="min-h-screen bg-background p-6">
@@ -438,6 +386,75 @@ export function Crud () {
                             </div>
 
                             <div>
+                                <Label htmlFor="instituition">Instituição</Label>
+                                <Input
+                                    id="instituition"
+                                    value={instituition}
+                                    onChange={(e) => setInstituition(e.target.value)}
+                                    placeholder="Instituição do produto"
+                                    type="text"
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="period">Período</Label>
+                                <Input
+                                    id="period"
+                                    value={period}
+                                    onChange={(e) => setPeriod(e.target.value)}
+                                    placeholder="Período do produto"
+                                    type="text"
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="value">Valor</Label>
+                                <Input 
+                                    id="value"
+                                    value={value ?? ""}
+                                    onChange={(e) => setValue(e.target.value === "" ? null : Number(e.target.value))}
+                                    placeholder="Valor do produto"
+                                    type="number"
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="techs">Tecnologias</Label>
+                                
+                                <div>
+                                    <Input 
+                                        id="techs"
+                                        value={techInput}
+                                        onChange={(e) => setTechInput(e.target.value)}
+                                        placeholder="Digite uma tecnologia e pressione Enter"
+                                        type="text"
+                                        onKeyUp={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                addTech();
+                                            }
+                                        }}
+                                    />
+                                    <Button onClick={addTech}>
+                                        Adicionar
+                                    </Button>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {techs.map((tech, index) => (
+                                        <div key={index}>
+                                            {tech}
+                                            <Button 
+                                                onClick={() => removeTech(index)}
+                                            >
+                                                ×
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
                                 <Label htmlFor="fileUrl">Arquivo</Label>
                                 <Input 
                                     id="fileurl"
@@ -479,6 +496,10 @@ export function Crud () {
                                         setTypeUpdt(TipoProduto.find(type => type.id === selectedProduct.tipo) || null);
                                         setDescriptionUpdt(selectedProduct.descricao);
                                         setPreviewUrl(selectedProduct.fileUrl || null);
+                                        setInstituitionUpdt(selectedProduct.instituicao);
+                                        setPeriodUpdt(selectedProduct.periodo || "");
+                                        setValueUpdt(selectedProduct.valor);
+                                        setTechsUpdt(selectedProduct.tecnologiasArray!);
                                     }
                                 }}>
                                     <SelectTrigger>
@@ -538,6 +559,75 @@ export function Crud () {
                             </div>
 
                             <div>
+                                <Label htmlFor="instituitionUpdt">Instituição</Label>
+                                <Input
+                                    id="instituitionUpdt"
+                                    value={instituitionUpdt}
+                                    onChange={(e) => setInstituitionUpdt(e.target.value)}
+                                    placeholder="Instituição do produto"
+                                    type="text"
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="periodUpdt">Período</Label>
+                                <Input
+                                    id="periodUpdt"
+                                    value={periodUpdt}
+                                    onChange={(e) => setPeriodUpdt(e.target.value)}
+                                    placeholder="Período do produto"
+                                    type="text"
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="valueUpdt">Valor</Label>
+                                <Input 
+                                    id="valueUpdt"
+                                    value={valueUpdt ?? ""}
+                                    onChange={(e) => setValueUpdt(e.target.value === "" ? null : Number(e.target.value))}
+                                    placeholder="Valor do produto"
+                                    type="number"
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="techsUpdt">Tecnologias</Label>
+                                
+                                <div>
+                                    <Input 
+                                        id="techsUpdt"
+                                        value={techInputUpdt}
+                                        onChange={(e) => setTechInputUpdt(e.target.value)}
+                                        placeholder="Digite uma tecnologia e pressione Enter"
+                                        type="text"
+                                        onKeyUp={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                addTechUpdt();
+                                            }
+                                        }}
+                                    />
+                                    <Button onClick={addTechUpdt}>
+                                        Adicionar
+                                    </Button>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {techsUpdt.map((tech, index) => (
+                                        <div key={index}>
+                                            {tech}
+                                            <Button
+                                                onClick={() => removeTechUpdt(index)}
+                                            >
+                                                ×
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
                                 <Label htmlFor="previewUrl">Arquivo</Label>
                                 {previewUrl && (
                                     <div className="mb-2">
@@ -572,7 +662,7 @@ export function Crud () {
                 </Card>
 
                 {/* Delete Product */}
-                             <Card>
+                <Card>
                     <CardHeader>
                         <CardTitle>Exclusão de Produtos</CardTitle>
                         <CardDescription>Remova um produto do sistema</CardDescription>
