@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ThemeSelector }  from "@/Theme/ThemeSelector";
-
+// import { useTheme } from "next-themes";
 
 
 interface Product {
@@ -28,8 +28,8 @@ export function Home  () {
     const [cart, setCart] = useState<Product[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<TipoProduto["id"] | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-    const [products, setProducts] = useState<Product[]>([]);
-   
+    const [products, setProducts] = useState<Product[]>([]); 
+    // const { setTheme, resolvedTheme  } = useTheme();
 
 
     const addToCart = (item: Product) => {
@@ -77,6 +77,13 @@ export function Home  () {
                             ))}     
                         </nav>
                         <ThemeSelector />
+                        {/* <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
+                            >
+                            {resolvedTheme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                        </Button> */}
                         <Button variant="outline" className="relative">
                             <ShoppingCart className="h-4 w-4 mr-2" />
                             Cart
@@ -99,13 +106,17 @@ export function Home  () {
                             Explore my CV in a unique way. Each item represents an experience, knowledge, or achievement in my academic and professional career.
                         </p>
                         <div className="flex justify-center gap-4">
-                            <Button size="lg">
-                                <Heart className="h-4 w-4 mr-2" />
-                                Explore Items
-                            </Button>
-                            <Button variant="outline" size="lg">
-                                About the Project
-                            </Button>    
+                            <a href="#productsG">
+                                <Button size="lg">
+                                    <Heart className="h-4 w-4 mr-2" />
+                                    Explore Items
+                                </Button>
+                            </a>
+                            <a href="#aboutG">
+                                <Button variant="outline" size="lg">
+                                    About the Project
+                                </Button>    
+                            </a>
                         </div>
                     </section>
 
@@ -137,7 +148,7 @@ export function Home  () {
 
 
                     {/* Product's Grid*/}
-                    <section>
+                    <section id="productsG">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-2xl font-bold">
                                 {selectedCategory != null
@@ -169,7 +180,22 @@ export function Home  () {
                                     </CardHeader>
                                     <CardContent>
                                         <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                            {product.descricao}
+                                            {/* {product.descricao} */}
+                                              {product.descricao.split(/(https?:\/\/[^\s]+|www\.[^\s]+)/g).map((part, i) =>
+                                                    /(https?:\/\/[^\s]+|www\.[^\s]+)/.test(part) ? (
+                                                    <a
+                                                        key={i}
+                                                        href={part.startsWith('http') ? part : `https://${part}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-500 underline"
+                                                    >
+                                                        {part}
+                                                    </a>
+                                                    ) : (
+                                                    part
+                                                    )
+                                                )}
                                         </p>
                                         <div className="flex flex-wrap gap-1 mb-4">
                                             {product.tecnologiasArray?.map((skill: string, i: number) => ( 
@@ -202,7 +228,7 @@ export function Home  () {
                     </section>
 
                     {/* About Project */}
-                    <section className="mt-16 py-12 bg-muted/30 rounded-lg">
+                    <section className="mt-16 py-12 bg-muted/30 rounded-lg" id="aboutG">
                         <div className="text-center mb-8">
                             <h3 className="text-3xl font-bold mb-4">About This Project</h3>
                             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -227,7 +253,7 @@ export function Home  () {
                                 </div>
                                 <h4 className="font-semibold mb-2">Technology</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Developed with React, TypeScript and .NET
+                                    Developed with React, TypeScript, .NET, PostgreSQL, and AWS S3.
                                 </p>
                             </div>
                             <div className="text-center">
