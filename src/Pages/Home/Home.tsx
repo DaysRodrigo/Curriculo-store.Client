@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../../Services/ProductService";
 import { TipoProduto } from "@/Enums/TipoProduto";
-import { ShoppingCart, User, Code, Heart, Star, Moon, Sun } from "lucide-react";
+import { ShoppingCart, User, Code, Heart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ThemeSelector }  from "@/Theme/ThemeSelector";
-import { useTheme } from "next-themes";
+
 
 
 interface Product {
@@ -29,7 +29,7 @@ export function Home  () {
     const [selectedCategory, setSelectedCategory] = useState<TipoProduto["id"] | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
-    const { setTheme, resolvedTheme  } = useTheme();
+   
 
 
     const addToCart = (item: Product) => {
@@ -65,7 +65,7 @@ export function Home  () {
                                 All Items
                             </Button>
                             {TipoProduto.map(type => (
-                                <Button
+                                 <Button
                                     key={type.id}
                                     variant="ghost"
                                     onClick={() => setSelectedCategory(type.id)}
@@ -77,14 +77,6 @@ export function Home  () {
                             ))}     
                         </nav>
                         <ThemeSelector />
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
-                            >
-                            {resolvedTheme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                        </Button>
-
                         <Button variant="outline" className="relative">
                             <ShoppingCart className="h-4 w-4 mr-2" />
                             Cart
