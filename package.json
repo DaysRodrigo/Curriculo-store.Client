@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest --coverage",
-    "test:unit": "jest --testPathPatterns=src/tests/unit --coverage=false",
+    "test:unit": "jest --testPathPatterns=src/__tests__/unit --coverage=false",
     "test:integration": "jest --testPathPatterns=src/__tests__/integration\" --runInBand --testTimeout=30000 --color"
   },
   "dependencies": {
