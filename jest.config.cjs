@@ -12,4 +12,10 @@ module.exports = {
         '^@/config/__mocks__/api$': '<rootDir>/src/config/__mocks__/api.ts',
         '^@/(.*)$': '<rootDir>/src/$1', // <- mapeia o alias @ para src
     },
+    roots: ['<rootDir>/src'], //mapeamento para o workflow
+    testMatch: [
+        '<rootDir>/src/__tests__/unit/**/*.[jt]s?(x)',
+        '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
+        '**/?(*.)+(spec|test).[jt]s?(x)'
+    ],
 };
