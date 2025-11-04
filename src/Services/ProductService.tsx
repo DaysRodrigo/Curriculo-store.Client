@@ -25,7 +25,13 @@ export const getProducts = async () => {
 
 export const getProductById = async (id: number) => {
     try {
-        const response = await fetch(`${API_URL}/api/produtos/${id}`);
+        const response = await fetch(`${API_URL}/api/produtos/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error(`Erro: ${response.status}`);

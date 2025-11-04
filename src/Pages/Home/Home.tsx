@@ -191,7 +191,7 @@ export function Home  () {
                                                         rel="noopener noreferrer"
                                                         className="text-blue-500 underline"
                                                     >
-                                                        {part}
+                                                        {product.nome}
                                                     </a>
                                                     ) : (
                                                     part
@@ -203,6 +203,18 @@ export function Home  () {
                                                 <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
                                             ))}
 
+                                        </div>
+                                        <div className="flex flex-wrap gap-2 mb-4">
+                                            {product.fileUrl && (
+                                                <a
+                                                    href={product.fileUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-500 underline"
+                                                >
+                                                    {product.nome}
+                                                </a>
+                                            ) || <span>No File Available</span>}
                                         </div>
                                         <div className="flex gap-2">
                                             <Button

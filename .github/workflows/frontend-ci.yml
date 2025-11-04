@@ -31,11 +31,15 @@ jobs:
         run: |
           if npm run | grep -q "lint"; then npm run lint; else echo "Sem script lint, pulando"; fi
 
-      - name: Run tests
+      - name: Run unit tests
         env:
           CI: true
         run: |
-          if npm run | grep -q "test"; then npm run test -- --watch=false || npm run test -- --run; else echo "Sem script test, pulando"; fi
+          if npm run | grep -q "test:unit"; then
+            npm run test:unit -- --watchAll=false --runInBand
+          else
+            echo "Sem script test:unit, pulando"
+          fi
         
       - name: Build
         run: |
